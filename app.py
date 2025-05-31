@@ -7,52 +7,69 @@ from visualizations.pcigraph import show_visualizations
 from scripts.summary import prepare_summary_for_llm
 from scripts.llm_engine import analyze_with_llm
 
-# Page config with custom browser tab icon
+# Page config with emoji fallback
 st.set_page_config(
     page_title="RunwAI – Pavement AI Assistant",
-    page_icon="logo/image.png",  # Use your custom logo
+    page_icon="🛫",
     layout="wide"
 )
 
-# Layout: Logo + Title left, Uploader right
-col1, col2 = st.columns([4, 1])
+# --- HEADER: Logo + Title left, Upload right ---
+header_left, header_right = st.columns([5, 1])
 
-with col1:
-    st.image("logo/image.png", width=60)  # Top-left logo
-    st.markdown("## RunwAI – Pavement Condition Analyzer")
-    st.markdown("##### FAA-aligned AI assistant for airport pavement assessment and treatment planning.")
+with header_left:
+    st.markdown(
+        """
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
+            <img src="logo/image.png" width="50"/>
+            <div>
+                <h2 style="margin-bottom: 0;">RunwAI – Pavement Condition Analyzer</h2>
+                <p style="margin-top: 0; font-size: 0.9rem; color: #444;">
+                    FAA-aligned AI assistant for airport pavement assessment and treatment planning.
+                </p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-with col2:
+with header_right:
     uploaded_file = st.file_uploader("📤 Upload XLSX/XLSM", type=["xlsx", "xlsm"])
 
-# Status + PCI (fill header gap)
-with col1:
-    if uploaded_file:
-        try:
-            df_cleaned = flatten_and_clean(uploaded_file)
-            avg_pci = df_cleaned['PCI Score'].mean()
+# --- STATUS + PCI Summary ---
+if uploaded_file:
+    try:
+        df_cleaned = flatten_and_clean(uploaded_file)
+        avg_pci = df_cleaned['PCI Score'].mean()
 
-            st.markdown("✅ File processed successfully!")
-            st.markdown(
-                f"""
-                <div style="padding: 0.5rem 1rem; background-color: #E9F5FF; border-radius: 10px; width: fit-content; margin-top: 0.5rem;">
-                    <b>📊 Average PCI:</b> <span style="font-size: 1.4rem; color: #0072CE;"><b>{avg_pci:.1f}</b></span>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        except Exception as e:
-            st.error(f"❌ Error processing file: {str(e)}")
-    else:
-        st.info("📎 Please upload a file to get started.")
+        st.markdown(
+            "<p style='text-align: center; color: green;'>✅ File processed successfully!</p>",
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            f"""
+            <div style="padding: 0.5rem 1rem; background-color: #E9F5FF;
+                        border-radius: 10px; width: fit-content; margin: 0 auto;">
+                <b>📊 Average PCI:</b>
+                <span style="font-size: 1.4rem; color: #0072CE;"><b>{avg_pci:.1f}</b></span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    except Exception as e:
+        st.error(f"❌ Error processing file: {str(e)}")
+else:
+    st.markdown(
+        "<p style='text-align: center; color: #444;'>📎 Please upload a file to get started.</p>",
+        unsafe_allow_html=True
+    )
 
-# Main content (only run if file is processed)
+# --- MAIN LOGIC ---
 if uploaded_file:
     try:
         if "df_cleaned" not in locals():
             df_cleaned = flatten_and_clean(uploaded_file)
 
-        # Tabs for visual analysis and AI
         tab1, tab2 = st.tabs(["📈 Visual Insights", "🧠 AI Recommendations"])
 
         with tab1:
@@ -77,7 +94,7 @@ if uploaded_file:
     except Exception as e:
         st.error(f"❌ Error analyzing file: {str(e)}")
 
-# Footer
+# --- FOOTER ---
 st.markdown("---")
 st.markdown(
     "<center><sub>Powered by RunwAI • FAA Pavement AI Tools • v1.0</sub></center>",
