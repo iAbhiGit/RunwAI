@@ -1,13 +1,14 @@
 import streamlit as st
 import pandas as pd
 import time
+from PIL import Image
 
 from scripts.flatten import flatten_and_clean
 from visualizations.pcigraph import show_visualizations
 from scripts.summary import prepare_summary_for_llm
 from scripts.llm_engine import analyze_with_llm
 
-# Page config with emoji fallback
+# Page config
 st.set_page_config(
     page_title="RunwAI – Pavement AI Assistant",
     page_icon="🛫",
@@ -18,17 +19,18 @@ st.set_page_config(
 header_left, header_right = st.columns([5, 1])
 
 with header_left:
+    try:
+        logo = Image.open("logo/image.png")
+        st.image(logo, width=50)
+    except Exception:
+        st.warning("⚠️ Logo image not found.")
+
     st.markdown(
         """
-        <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
-            <img src="logo/image.png" width="50"/>
-            <div>
-                <h2 style="margin-bottom: 0;">RunwAI – Pavement Condition Analyzer</h2>
-                <p style="margin-top: 0; font-size: 0.9rem; color: #444;">
-                    FAA-aligned AI assistant for airport pavement assessment and treatment planning.
-                </p>
-            </div>
-        </div>
+        <h2 style='margin-bottom: 0;'>RunwAI – Pavement Condition Analyzer</h2>
+        <p style='margin-top: 0; font-size: 0.9rem; color: #444;'>
+            FAA-aligned AI assistant for airport pavement assessment and treatment planning.
+        </p>
         """,
         unsafe_allow_html=True
     )
