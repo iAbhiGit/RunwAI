@@ -1,14 +1,15 @@
 import os
+import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables
+# Load local .env if available (for local testing only)
 load_dotenv()
 
-# Get API key
-api_key = os.getenv("OPENAI_API_KEY")
+# Get API key securely from Streamlit secrets or fallback to .env
+api_key = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY"))
 if not api_key:
-    raise ValueError("OPENAI_API_KEY not found. Please set it in your .env file or environment variables.")
+    raise ValueError("OPENAI_API_KEY not found. Please set it in Streamlit secrets or .env")
 
 # Initialize OpenAI client
 client = OpenAI(api_key=api_key)
@@ -31,10 +32,10 @@ Provide both:
 
 Format the long-term treatments as a Markdown table with these columns:
 
-| Condition/Test Result | Recommended Treatment | Notes |
-|-----------------------|------------------------|-------|
-| e.g. Base failure confirmed | Full-depth reconstruction | Prioritize critical segments |
-| e.g. Surface cracking only | Mill & overlay | Consider night work for runways |
+| Condition/Test Result       | Recommended Treatment     | Notes                         |
+|----------------------------|---------------------------|-------------------------------|
+| e.g. Base failure confirmed | Full-depth reconstruction | Prioritize critical segments  |
+| e.g. Surface cracking only  | Mill & overlay            | Consider night work for runways |
 
 Only include realistic airport pavement actions (e.g., slurry seal, FDR, crack seal, overlay, patching). Avoid vague suggestions.
 5. **FAA Red Flags** Call out any PCI < 60 segments and why they need urgent attention.
